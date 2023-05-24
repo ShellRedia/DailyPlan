@@ -239,3 +239,24 @@ function generateTemporary() {
 
     return form_container;
 }
+
+function generateDisplayWidgets(title, dct_id){
+    var display_dct_string = document.getElementById(dct_id).getAttribute("data-dict");
+//    display_dct_string.replace()
+    var display_container = document.createElement("div");
+    display_container.className = "container-fluid"
+
+    var title_item = document.createElement("p");
+    title_item.innerText = title;
+    display_container.appendChild(title_item);
+
+    var jsonString = '{"name": "John", "age": 30, "city": "New York"}';
+    var myDict = JSON.parse(display_dct_string);
+    console.log(myDict)
+    var display_table = document.createElement("table");
+
+
+
+
+    return display_container;
+}
