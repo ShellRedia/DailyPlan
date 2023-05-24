@@ -21,5 +21,7 @@ from app01 import views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('index/', views.index)
+    path('main/', views.main),
+    path('create_transaction/', views.create_transaction),
+    path('finish_transaction/', views.finish_transaction),
 ]

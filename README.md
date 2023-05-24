@@ -25,7 +25,7 @@
 
     1> 事务名称
     2> 周期 或 每周的哪一天
-    3> 是否完成当前周期
+    3> 是否完成当前周期 (查看 Only)
     4> 重要程度值
     5> 提醒周期
     6> 进度
@@ -89,3 +89,7 @@ wsgi.py : 接收网络请求 (不要动)
 在urls.py中，导入app01.views文件，将urlpatterns列表中的path替换为: path('index/', views.index)，表明路径和函数的调用关系。
 
 启动服务: python manage.py runserver
+
+写对应的.html文件，在app01目录下添加名为 templates 的文件夹，存放对应的 .html文件。
+
+图片等资源文件的使用，在app01目录下添加名为 static 的文件夹，存放于此。
