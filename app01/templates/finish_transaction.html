@@ -8,7 +8,7 @@
     <!-- Bootstrap 的 CSS 文件 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 
-    <title>Create transaction</title>
+    <title>Finish transaction</title>
   </head>
   <body>
     <!-- JavaScript 文件是可选的。从以下两种建议中选择一个即可！ -->
@@ -30,12 +30,10 @@
             optionsContainer.removeChild(optionsContainer.firstChild);
           }
         if (checkedOptions.includes('routine')) {
-          finishRoutine();
-<!--          optionsContainer.appendChild();-->
+          optionsContainer.appendChild(finishRoutine());
         }
         else {
-          finishTemporary();
-<!--          optionsContainer.appendChild();-->
+          optionsContainer.appendChild(finishTemporary());
         }
       });
     });
@@ -45,8 +43,6 @@
 
     <div id="routine_dct" data-dict= "{{ routine }}" > </div>
     <div id="temporary_dct" data-dict= "{{ temporary }}" > </div>
-
-
 
     <h4>事务类型</h4>
 
@@ -66,9 +62,8 @@
       {% csrf_token %}
       <div id="options"></div>
       <script>
-        finishRoutine();
-<!--        var optionsContainer = document.getElementById('options');-->
-<!--        optionsContainer.appendChild();-->
+        var optionsContainer = document.getElementById('options');
+        optionsContainer.appendChild(finishRoutine());
       </script>
       <input class="btn btn-primary" type="submit" name="submit" value="提交">
       <input class="btn btn-primary" type="submit" name="back" value="返回"><br><br>

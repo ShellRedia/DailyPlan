@@ -149,7 +149,7 @@ function generateTemporary() {
     limit_hour_slider.id = "limit_hour";
     limit_hour_slider.min = 0;
     limit_hour_slider.max = 23;
-    limit_hour_slider.name = "limit_hour";
+    limit_hour_slider.name = "limit_hour_slider";
 
     var limit_hour_label = document.createElement("span");
     limit_hour_slider.addEventListener('input', function() {
@@ -279,7 +279,7 @@ function generateDisplayWidgets(title, dct_id){
     for (var i = 0; i < dct_len; i++){
         var row_tr = document.createElement("tr");
         var row_th = document.createElement("th");
-        row_th.innerText = i+1;
+        row_th.innerText = i;
         row_tr.appendChild(row_th);
         for (var k in display_dct){
             var row_td = document.createElement("td");
@@ -303,6 +303,56 @@ function finishRoutine(){
 
     var form_container = document.createElement("div");
     form_container.className = "container-fluid";
+
+    // 1> 所选事务序号:
+    var index_item = document.createElement("p");
+    index_item.innerText = "所选事务序号";
+    var index_text = document.createElement("input");
+    index_text.type = "text";
+    index_text.name = "selected_index";
+
+    form_container.appendChild(index_item);
+    form_container.appendChild(index_text);
+    form_container.appendChild(document.createElement("br"));
+    form_container.appendChild(document.createElement("hr"));
+
+    // 2> 完成类型:
+    //   1> 完成当前周期:
+    var finish_type_1 = document.createElement("input");
+    finish_type_1.type = "radio";
+    finish_type_1.name = "finish_type";
+    finish_type_1.id = "finish_current";
+    finish_type_1.value = "current";
+    finish_type_1.checked = true;
+    var finish_label_1 = document.createElement("label");
+    finish_label_1.innerText = "完成当前周期";
+    finish_label_1.setAttribute("for", "finish_current");
+    form_container.appendChild(finish_type_1);
+    form_container.appendChild(finish_label_1);
+    //    2> 全部完成:
+    var finish_type_2 = document.createElement("input");
+    finish_type_2.type = "radio";
+    finish_type_2.name = "finish_type";
+    finish_type_2.id = "finish_all";
+    finish_type_2.value = "all";
+    var finish_label_2 = document.createElement("label");
+    finish_label_2.innerText = "全部完成";
+    finish_label_2.setAttribute("for", "finish_all");
+    form_container.appendChild(finish_type_2);
+    form_container.appendChild(finish_label_2);
+    //    3> 放弃:
+    var finish_type_3 = document.createElement("input");
+    finish_type_3.type = "radio";
+    finish_type_3.name = "finish_type";
+    finish_type_3.id = "finish_give_up";
+    finish_type_3.value = "give_up";
+    var finish_label_3 = document.createElement("label");
+    finish_label_3.innerText = "放弃";
+    finish_label_3.setAttribute("for", "finish_give_up");
+    form_container.appendChild(finish_type_3);
+    form_container.appendChild(finish_label_3);
+
+    form_container.appendChild(document.createElement("br"));
     form_container.appendChild(document.createElement("hr"));
 
     return form_container;
@@ -314,4 +364,49 @@ function finishTemporary(){
         DisplayContainer.removeChild(DisplayContainer.firstChild);
     }
     DisplayContainer.appendChild(generateDisplayWidgets("临时事务", "temporary_dct"));
+
+    var form_container = document.createElement("div");
+    form_container.className = "container-fluid";
+
+    // 1> 所选事务序号:
+    var index_item = document.createElement("p");
+    index_item.innerText = "所选事务序号";
+    var index_text = document.createElement("input");
+    index_text.type = "text";
+    index_text.name = "selected_index";
+
+    form_container.appendChild(index_item);
+    form_container.appendChild(index_text);
+    form_container.appendChild(document.createElement("br"));
+    form_container.appendChild(document.createElement("hr"));
+
+    // 2> 完成类型:
+    //   1> 完成:
+    var finish_type_1 = document.createElement("input");
+    finish_type_1.type = "radio";
+    finish_type_1.name = "finish_type";
+    finish_type_1.id = "finish_finish";
+    finish_type_1.value = "finish";
+    finish_type_1.checked = true;
+    var finish_label_1 = document.createElement("label");
+    finish_label_1.innerText = "完成当前周期";
+    finish_label_1.setAttribute("for", "finish_finish");
+    form_container.appendChild(finish_type_1);
+    form_container.appendChild(finish_label_1);
+    //    2> 放弃:
+    var finish_type_2 = document.createElement("input");
+    finish_type_2.type = "radio";
+    finish_type_2.name = "finish_type";
+    finish_type_2.id = "finish_give_up";
+    finish_type_2.value = "give_up";
+    var finish_label_2 = document.createElement("label");
+    finish_label_2.innerText = "放弃";
+    finish_label_2.setAttribute("for", "finish_give_up");
+    form_container.appendChild(finish_type_2);
+    form_container.appendChild(finish_label_2);
+
+    form_container.appendChild(document.createElement("br"));
+    form_container.appendChild(document.createElement("hr"));
+
+    return form_container;
 }

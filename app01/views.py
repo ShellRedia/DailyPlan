@@ -1,41 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-import pandas as pd
-from datetime import datetime
-import os
-
-transaction_types = ["routine", "temporary"]
-
-rename_dct = {
-    "transaction_type": "类型",
-    "name_text": "名称",
-    "period_slider": "周期",
-    "crucial_slider": "重要程度",
-    "remind_slider": "提醒周期",
-    "progress_slider": "总进度",
-    "remark_text": "备注",
-    "limit_day_slider": "时限(天)",
-    "limit_hour_slider": "时限(小时)"
-}
-
-def get_current_time_str():
-    d = str(datetime.today()).split(" ")[0]
-    t = str(datetime.now().time())[:-7].replace(":", "-")
-    return d + "_" + t
-
-def arrange_dataframe_dict(dct):
-    rnt = {}
-    for k, v in dct.items():
-        rnt[k] = [v[i] for i in range(len(v))]
-    return rnt
-
-def get_transaction_dct():
-    for x in transaction_types:
-        x = "Records/{}.xlsx".format(x)
-        if not os.path.exists(x):
-            pd.DataFrame().to_excel(x)
-    routine_dct, temporary_dct = [arrange_dataframe_dict(pd.read_excel('Records/{}.xlsx'.format(x)).iloc[:, 1:].to_dict())
-                                  for x in transaction_types]
-    return routine_dct, temporary_dct
+from func import *
 
 # Create your views here.
 def main(request):
@@ -46,7 +10,6 @@ def main(request):
             return redirect("../finish_transaction")
     return render(request, "main.html")
 
-
 # 处理.html所访问的函数:
 def create_transaction(request):
     routine_dct, temporary_dct = get_transaction_dct()
@@ -56,12 +19,10 @@ def create_transaction(request):
             return redirect("../main")
         elif "submit" in request.POST:
             form_dct = dict(request.POST)
-            if form_dct["transaction_type"] and form_dct["name_text"][0]:
-                transaction_type = form_dct["transaction_type"][0]
-                transaction_filepath = 'Records/{}.xlsx'.format(transaction_type)
-                df = pd.read_excel(transaction_filepath)
-                if len(df):
-                    df = df.iloc[:, 1:]
+            transaction_type = form_dct["transaction_type"][0]
+            transaction_name = form_dct["name_text"][0]
+            if transaction_type and transaction_name:
+                df = get_transaction_dataframe(transaction_type)
                 # 改项名:
                 dct_t = {}
                 for k, v in form_dct.items():
@@ -70,20 +31,51 @@ def create_transaction(request):
                 form_dct = dct_t
                 # -- 添加必要项，以供显示:
                 if transaction_type == "routine":
-                    form_dct["进度"] = 0
+                    form_dct["当前进度"] = 0
                 form_dct["记录时间"] = get_current_time_str()
 
                 new_record = pd.DataFrame(form_dct)
                 df = pd.concat([df, new_record])
+
+                transaction_filepath = 'Records/{}.xlsx'.format(transaction_type)
                 df.to_excel(transaction_filepath)
+
                 return redirect("../main")
     return render(request, 'create_transaction.html', dict(zip(transaction_types, [routine_dct, temporary_dct])))
 
 def finish_transaction(request):
     routine_dct, temporary_dct = get_transaction_dct()
+
     if request.method == "POST":
         if "back" in request.POST:
             return redirect("../main")
         elif "submit" in request.POST:
-            return redirect("../main")
+            request_dct = dict(request.POST)
+            transaction_type = request_dct["transaction_type"][0]
+            selected_index = request_dct["selected_index"][0]
+            finish_type = request_dct["finish_type"][0]
+
+            if selected_index.isdigit():
+                si = int(selected_index)
+                cond1 = transaction_type == "routine" and 0 <= si < tran_len(routine_dct)
+                cond2 = transaction_type == "temporary" and 0 <= si < tran_len(temporary_dct)
+
+                if cond1 or cond2:
+                    df = get_transaction_dataframe(transaction_type)
+                    submit_record_file = "Records/Reports/submit_{}.txt".format(date.today())
+                    f = open(submit_record_file, "a")
+                    if finish_type == "current":
+                        df["当前进度"][si] += 1
+                        f.writelines(["打卡日常: {}, 进度: {}\n".format(routine_dct["名称"][si], routine_dct["进度"][si])])
+                    else:
+                        if finish_type == "finish":
+                            f.writelines(["完成事务: {}\n".format(routine_dct["名称"][si])])
+                        elif finish_type == "finish":
+                            f.writelines(["放弃事务: {}\n".format(routine_dct["名称"][si])])
+                        df = df.drop(df.index[si])
+
+                    transaction_filepath = 'Records/{}.xlsx'.format(transaction_type)
+                    df.to_excel(transaction_filepath)
+
+                return redirect("../main")
     return render(request, "finish_transaction.html", dict(zip(transaction_types, [routine_dct, temporary_dct])))
