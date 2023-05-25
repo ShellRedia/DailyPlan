@@ -112,7 +112,8 @@ function generateRoutine() {
     remark_item.innerText = "备注";
     var remark_text = document.createElement("input");
     remark_text.type = "text";
-    remark_text.name = "remark_text"
+    remark_text.name = "remark_text";
+    remark_text.value = "xxx";
 
     form_container.appendChild(remark_item);
     form_container.appendChild(remark_text);
@@ -148,7 +149,7 @@ function generateTemporary() {
     limit_hour_slider.id = "limit_hour";
     limit_hour_slider.min = 0;
     limit_hour_slider.max = 23;
-    limit_hour_slider.name = "limit_hour_slider";
+    limit_hour_slider.name = "limit_hour";
 
     var limit_hour_label = document.createElement("span");
     limit_hour_slider.addEventListener('input', function() {
@@ -231,6 +232,7 @@ function generateTemporary() {
     var remark_text = document.createElement("input");
     remark_text.type = "text";
     remark_text.name = "remark_text";
+    remark_text.value = "xxx";
 
     form_container.appendChild(remark_item);
     form_container.appendChild(remark_text);
@@ -242,21 +244,52 @@ function generateTemporary() {
 
 function generateDisplayWidgets(title, dct_id){
     var display_dct_string = document.getElementById(dct_id).getAttribute("data-dict");
-//    display_dct_string.replace()
+    display_dct_string = display_dct_string.replace(/'/g, '"');
     var display_container = document.createElement("div");
-    display_container.className = "container-fluid"
+    display_container.className = "container-fluid";
 
-    var title_item = document.createElement("p");
+    var title_item = document.createElement("h4");
     title_item.innerText = title;
     display_container.appendChild(title_item);
 
-    var jsonString = '{"name": "John", "age": 30, "city": "New York"}';
-    var myDict = JSON.parse(display_dct_string);
-    console.log(myDict)
-    var display_table = document.createElement("table");
+    var display_dct = JSON.parse(display_dct_string);
 
+    var display_table = document.createElement("table-striped");
+    var display_thead = document.createElement("thead");
+    var display_tr = document.createElement("tr");
+    var display_th = document.createElement("th");
+    display_th.innerText = "#";
+    display_tr.appendChild(display_th);
 
+    var dct_len = 114514;
+    for (var k in display_dct){
+        var display_th = document.createElement("th");
+        display_th.innerText = k;
+        dct_len = Math.min(dct_len, display_dct[k].length);
+        display_tr.appendChild(display_th);
+    }
+    display_thead.appendChild(display_tr);
+    display_table.appendChild(display_thead);
 
+    if (dct_len == 114514){
+        dct_len = 0;
+    }
 
+    var display_tbody = document.createElement("tbody");
+    for (var i = 0; i < dct_len; i++){
+        var row_tr = document.createElement("tr");
+        var row_th = document.createElement("th");
+        row_th.innerText = i+1;
+        row_tr.appendChild(row_th);
+        for (var k in display_dct){
+            var row_td = document.createElement("td");
+            row_td.innerText = display_dct[k][i];
+            row_tr.appendChild(row_td);
+        }
+        display_tbody.appendChild(row_tr);
+    }
+    display_table.appendChild(display_tbody);
+    display_container.appendChild(display_table);
+    display_container.appendChild(document.createElement("hr"));
     return display_container;
 }

@@ -15,13 +15,15 @@ def arrange_dataframe_dict(dct):
     return rnt
 
 rename_dct = {
-    "transaction_type": "type",
-    "name_text": "name",
-    "period_slider": "period",
-    "crucial_slider": "crucial",
-    "remind_slider": "remind_interval",
-    "progress_slider": "progress_total",
-    "remark_text": "remark"
+    "transaction_type": "类型",
+    "name_text": "名称",
+    "period_slider": "周期",
+    "crucial_slider": "重要程度",
+    "remind_slider": "提醒周期",
+    "progress_slider": "总进度",
+    "remark_text": "备注",
+    "limit_day_slider": "时限(天)",
+    "limit_hour_slider": "时限(小时)"
 }
 
 # Create your views here.
@@ -49,7 +51,8 @@ def create_transaction(request):
         elif "submit" in request.POST:
             form_dct = dict(request.POST)
             if form_dct["transaction_type"] and form_dct["name_text"][0]:
-                transaction_filepath = 'Records/{}.xlsx'.format(form_dct["transaction_type"][0])
+                transaction_type = form_dct["transaction_type"][0]
+                transaction_filepath = 'Records/{}.xlsx'.format(transaction_type)
                 df = pd.read_excel(transaction_filepath)
                 if len(df):
                     df = df.iloc[:, 1:]
@@ -60,8 +63,9 @@ def create_transaction(request):
                         dct_t[rename_dct[k]] = v
                 form_dct = dct_t
                 # -- 添加必要项，以供显示:
-                form_dct["progress"] = 0
-                form_dct["time"] = get_current_time_str()
+                if transaction_type == "routine":
+                    form_dct["进度"] = 0
+                form_dct["记录时间"] = get_current_time_str()
 
                 new_record = pd.DataFrame(form_dct)
                 df = pd.concat([df, new_record])

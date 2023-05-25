@@ -43,11 +43,13 @@
     <hr>
 
     <div id="routine_dct" data-dict= "{{ routine }}" > </div>
+    <div id="temporary_dct" data-dict= "{{ temporary }}" > </div>
 
     <div id="display"></div>
     <script>
       var DisplayContainer = document.getElementById('display');
       DisplayContainer.appendChild(generateDisplayWidgets("日常事务", "routine_dct"));
+      DisplayContainer.appendChild(generateDisplayWidgets("临时事务", "temporary_dct"));
     </script>
     <h4>事务类型</h4>
 
@@ -62,7 +64,7 @@
         <label class="form-check-label" for="temporary">临时</label>
       </div>
       {% csrf_token %}
-      <div id="options"></div>>
+      <div id="options"></div>
       <script>
         var optionsContainer = document.getElementById('options');
         optionsContainer.appendChild(generateRoutine());
