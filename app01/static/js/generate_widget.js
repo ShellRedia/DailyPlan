@@ -1,6 +1,6 @@
 function generateRoutine() {
     var form_container = document.createElement("div");
-    form_container.className = "container-fluid"
+    form_container.className = "container-fluid";
     form_container.appendChild(document.createElement("hr"));
 
     // 1> 事务名称
@@ -125,7 +125,7 @@ function generateRoutine() {
 
 function generateTemporary() {
     var form_container = document.createElement("div");
-    form_container.className = "container-fluid"
+    form_container.className = "container-fluid";
     form_container.appendChild(document.createElement("hr"));
 
     // 1> 事务名称
@@ -292,4 +292,26 @@ function generateDisplayWidgets(title, dct_id){
     display_container.appendChild(display_table);
     display_container.appendChild(document.createElement("hr"));
     return display_container;
+}
+
+function finishRoutine(){
+    var DisplayContainer = document.getElementById('display');
+    while (DisplayContainer.firstChild) {
+        DisplayContainer.removeChild(DisplayContainer.firstChild);
+    }
+    DisplayContainer.appendChild(generateDisplayWidgets("日常事务", "routine_dct"));
+
+    var form_container = document.createElement("div");
+    form_container.className = "container-fluid";
+    form_container.appendChild(document.createElement("hr"));
+
+    return form_container;
+}
+
+function finishTemporary(){
+    var DisplayContainer = document.getElementById('display');
+    while (DisplayContainer.firstChild) {
+        DisplayContainer.removeChild(DisplayContainer.firstChild);
+    }
+    DisplayContainer.appendChild(generateDisplayWidgets("临时事务", "temporary_dct"));
 }

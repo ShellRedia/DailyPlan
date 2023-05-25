@@ -3,16 +3,7 @@ import pandas as pd
 from datetime import datetime
 import os
 
-def get_current_time_str():
-    d = str(datetime.today()).split(" ")[0]
-    t = str(datetime.now().time())[:-7].replace(":", "-")
-    return d + "_" + t
-
-def arrange_dataframe_dict(dct):
-    rnt = {}
-    for k, v in dct.items():
-        rnt[k] = [v[i] for i in range(len(v))]
-    return rnt
+transaction_types = ["routine", "temporary"]
 
 rename_dct = {
     "transaction_type": "类型",
@@ -26,6 +17,26 @@ rename_dct = {
     "limit_hour_slider": "时限(小时)"
 }
 
+def get_current_time_str():
+    d = str(datetime.today()).split(" ")[0]
+    t = str(datetime.now().time())[:-7].replace(":", "-")
+    return d + "_" + t
+
+def arrange_dataframe_dict(dct):
+    rnt = {}
+    for k, v in dct.items():
+        rnt[k] = [v[i] for i in range(len(v))]
+    return rnt
+
+def get_transaction_dct():
+    for x in transaction_types:
+        x = "Records/{}.xlsx".format(x)
+        if not os.path.exists(x):
+            pd.DataFrame().to_excel(x)
+    routine_dct, temporary_dct = [arrange_dataframe_dict(pd.read_excel('Records/{}.xlsx'.format(x)).iloc[:, 1:].to_dict())
+                                  for x in transaction_types]
+    return routine_dct, temporary_dct
+
 # Create your views here.
 def main(request):
     if request.method == "POST":
@@ -38,13 +49,8 @@ def main(request):
 
 # 处理.html所访问的函数:
 def create_transaction(request):
-    transaction_types = ["routine", "temporary"]
-    for x in transaction_types:
-        x = "Records/{}.xlsx".format(x)
-        if not os.path.exists(x):
-            pd.DataFrame().to_excel(x)
-    routine_dct, temporary_dct = [arrange_dataframe_dict(pd.read_excel('Records/{}.xlsx'.format(x)).iloc[:, 1:].to_dict())
-                                  for x in transaction_types]
+    routine_dct, temporary_dct = get_transaction_dct()
+
     if request.method == "POST":
         if "back" in request.POST:
             return redirect("../main")
@@ -74,7 +80,10 @@ def create_transaction(request):
     return render(request, 'create_transaction.html', dict(zip(transaction_types, [routine_dct, temporary_dct])))
 
 def finish_transaction(request):
+    routine_dct, temporary_dct = get_transaction_dct()
     if request.method == "POST":
         if "back" in request.POST:
             return redirect("../main")
-    return render(request, "finish_transaction.html")
+        elif "submit" in request.POST:
+            return redirect("../main")
+    return render(request, "finish_transaction.html", dict(zip(transaction_types, [routine_dct, temporary_dct])))
