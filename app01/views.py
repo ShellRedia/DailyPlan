@@ -53,8 +53,7 @@ def finish_transaction(request):
             request_dct = dict(request.POST)
             transaction_type = request_dct["transaction_type"][0]
             selected_index = request_dct["selected_index"][0]
-            finish_type = request_dct["finish_type"][0]
-
+            finish_type = request_dct["finish_type"][0] 
             if selected_index.isdigit():
                 si = int(selected_index)
                 cond1 = transaction_type == "routine" and 0 <= si < tran_len(routine_dct)
@@ -64,14 +63,15 @@ def finish_transaction(request):
                     df = get_transaction_dataframe(transaction_type)
                     submit_record_file = "Records/Reports/submit_{}.txt".format(date.today())
                     f = open(submit_record_file, "a")
+                    select_trans_dct = {"routine":routine_dct, "temporary":temporary_dct}[transaction_type]
                     if finish_type == "current":
                         df["当前进度"][si] += 1
-                        f.writelines(["打卡日常: {}, 进度: {}\n".format(routine_dct["名称"][si], routine_dct["进度"][si])])
+                        f.writelines(["打卡日常: {}, 进度: {}\n".format(select_trans_dct["名称"][si], select_trans_dct["进度"][si])])
                     else:
                         if finish_type == "finish":
-                            f.writelines(["完成事务: {}\n".format(routine_dct["名称"][si])])
-                        elif finish_type == "finish":
-                            f.writelines(["放弃事务: {}\n".format(routine_dct["名称"][si])])
+                            f.writelines(["完成事务: {}\n".format(select_trans_dct["名称"][si])])
+                        elif finish_type == "give_up":
+                            f.writelines(["放弃事务: {}\n".format(select_trans_dct["名称"][si])])
                         df = df.drop(df.index[si])
 
                     transaction_filepath = 'Records/{}.xlsx'.format(transaction_type)

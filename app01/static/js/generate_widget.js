@@ -389,7 +389,7 @@ function finishTemporary(){
     finish_type_1.value = "finish";
     finish_type_1.checked = true;
     var finish_label_1 = document.createElement("label");
-    finish_label_1.innerText = "完成当前周期";
+    finish_label_1.innerText = "完成";
     finish_label_1.setAttribute("for", "finish_finish");
     form_container.appendChild(finish_type_1);
     form_container.appendChild(finish_label_1);
