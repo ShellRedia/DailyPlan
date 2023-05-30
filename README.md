@@ -68,7 +68,7 @@
 
 ## 2.功能实现记录
 
-### 2.1 django
+### 2.1 django 基本配置
 
 django 管理前端，数据保存为.xlsx文件。
 
@@ -93,3 +93,103 @@ wsgi.py : 接收网络请求 (不要动)
 写对应的.html文件，在app01目录下添加名为 templates 的文件夹，存放对应的 .html文件。
 
 图片等资源文件的使用，在app01目录下添加名为 static 的文件夹，存放于此。
+
+### 2.2 html 和 javascript
+
+这两者同属前端，用于生成控件，并接收网页上的输入的，总的来说，html适合于写一些固定的内容，而javascript来做一些简单的控制。例如通过如下语句来生成相应控件，再返回给html显示。
+
+```
+document.createElement("div");
+```
+
+而 html 中的控件组织形式也遵循于树状结构，能够通过父子关系和 id属性进行查找。
+
+```
+var optionsContainer = document.getElementById('options');
+optionsContainer.firstChild;
+```
+
+因为 javascript 中支持这样的关系索引函数，以及常见的如列表、字典等数据结构和选择循环等语法结构，因此能够控制html做动态的显示。
+
+此外必须注意的是，数据在 django(python) \ html \ javascript 三者通信的问题。这个要分情况讨论一下:
+
+(1) html -> javascript: 首先要将传输的数据放在一个 html 容器中，然后在 js 文件中访问容器调用:
+
+html:
+```
+<div id="routine_dct" data-dict= "{{ routine }}" > </div>
+```
+
+javascript:
+```
+var display_dct_string = document.getElementById("routine_dct").getAttribute("data-dict");
+```
+
+感觉这种方法也许比较笨重，但是也可以接受。
+
+(2) javascript -> html: 通常不需要，因为可以直接由 js 控制 html 页面的行为，实在需要也可以通过返回值或者也装进某个容器当中。
+
+(3) html -> django: 经典提交表单，把要传递的内容相关的容器放在一个 from 标签中，要传递的容器内容要填写 name项 和 value项，这样能够通过一个字典的形式传递给 django 端。
+
+```
+<form method="POST" id="form_submit">
+      {% csrf_token %}
+      <div id="options"></div>
+      <script>
+        var optionsContainer = document.getElementById('options');
+        optionsContainer.appendChild(generateRoutine());
+      </script>
+      <input class="btn btn-primary" type="submit" name="submit" value="提交">
+      <input class="btn btn-primary" type="submit" name="back" value="返回"> <br><br>
+</form>
+```
+
+django 方面通过 request 变量来获取请求状态和获取字典内容，字典内容存储于 request.POST 中：
+
+```
+'''
+函数create_transaction()需要在 urls.py 中进行注册，建立页面地址和回调函数的联系。
+
+'''
+def create_transaction(request):
+    if request.method == "POST":
+        if "back" in request.POST:
+            pass
+            # ... any others
+```
+
+(4) django -> html:
+
+还是页面注册函数，将数据以字典的形式写在返回值中即可，例如:
+
+django:
+```
+def create_transaction(request):
+    '''
+    ... ...
+    '''
+    rnt_dict = {"dict for html" : " to use"}
+    return render(request, 'create_transaction.html', rnt_dict)
+```
+
+html 引用采用 双重花括号的方式: {{}}, 其实 django 那边不止可以传字典，其他基础数据结构也是支持的。
+
+html:
+```
+{{ rnt_dict }}
+```
+
+### 2.3 公网部署
+
+使用 Caddy, 装好 Caddy后，创建一个名为 Caddyfile 的文件，声明一个反向代理，具体步骤如图：
+![Caddy01](imgs/01.png)
+
+![Caddy02](imgs/02.png)
+（被挡住的为服务器ip）
+
+然后在django项目中进行启动即可成功访问：
+
+```
+python manage.py runserver 9998
+```
+![Caddy03](imgs/03.png)
